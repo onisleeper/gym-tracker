@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GYM TRACKER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0d0d">
+<link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+<div id="app">
+  <!-- Setup (初回のみ) -->
+  <div class="screen" id="screen-setup">
+    <div class="setup-container">
+      <h1 class="setup-title">GYM TRACKER</h1>
+      <p class="setup-sub">1ヶ月で運動の習慣をつける</p>
+      <div class="setup-card">
+        <p class="setup-desc">開始日を設定してスタート。<br>週ごとにメニューが自動で進化します。</p>
+        <label class="setup-label">開始日</label>
+        <input type="date" id="setup-date" class="setup-input">
+        <div class="setup-schedule" id="setup-schedule"></div>
+        <button class="btn-accent" id="setup-btn">はじめる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen" id="screen-home">
+    <div class="hero">
+      <h1>GYM TRACKER</h1>
+      <div class="phase-badge" id="phase-badge"></div>
+    </div>
+
+    <div class="schedule-indicator" id="schedule-indicator"></div>
+    <div class="week-bar" id="week-bar"></div>
+
+    <div class="weekly-goal" id="weekly-goal">
+      <div class="weekly-goal-num" id="weekly-remaining"></div>
+      <div class="weekly-goal-label">今週あと<span id="weekly-remaining-text"></span>回</div>
+      <div class="weekly-goal-bar">
+        <div class="weekly-goal-fill" id="weekly-fill"></div>
+      </div>
+    </div>
+
+    <div class="mode-select">
+      <button class="mode-btn mode-full active" data-mode="full" id="mode-full">
+        <span class="mode-icon">💪</span>
+        <span class="mode-name">フル</span>
+        <span class="mode-time" id="mode-full-time"></span>
+      </button>
+      <button class="mode-btn mode-light" data-mode="light" id="mode-light">
+        <span class="mode-icon">⚡</span>
+        <span class="mode-name">ライト</span>
+        <span class="mode-time">約15分</span>
+      </button>
+      <button class="mode-btn mode-minimum" data-mode="minimum" id="mode-minimum">
+        <span class="mode-icon">🔥</span>
+        <span class="mode-name">最低限</span>
+        <span class="mode-time">約10分</span>
+      </button>
+    </div>
+
+    <button class="btn-start" id="btn-start">START</button>
+
+    <div class="section-title">RECENT</div>
+    <div id="recent-logs"></div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="screen" id="screen-train">
+    <div class="train-header">
+      <button class="btn-back" id="btn-back-train">&larr;</button>
+      <h2 id="train-title"></h2>
+      <span class="train-mode-badge" id="train-mode-badge"></span>
+    </div>
+    <div class="progress-bar"><div class="fill" id="train-progress"></div></div>
+
+    <!-- 休息タイマー -->
+    <div class="rest-timer" id="rest-timer" style="display:none">
+      <div class="rest-timer-label">REST</div>
+      <div class="rest-timer-time" id="rest-timer-time">1:30</div>
+      <button class="rest-timer-skip" id="rest-timer-skip">スキップ</button>
+    </div>
+
+    <div id="exercise-list"></div>
+
+    <div class="train-footer">
+      <button class="btn-save-partial" id="btn-save-partial">ここまでで保存</button>
+    </div>
+
+    <div id="complete-area" style="display:none">
+      <div class="complete-card">
+        <h2>COMPLETE!</h2>
+        <p>おつかれさま！</p>
+        <button class="btn-accent" id="btn-save-complete">記録を保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="screen" id="screen-stats">
+    <div class="hero"><h1>STATS</h1></div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-total">0</div>
+        <div class="stat-label">TOTAL</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-week-streak">0</div>
+        <div class="stat-label">WEEKS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-week">0</div>
+        <div class="stat-label">THIS WEEK</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-sets">0</div>
+        <div class="stat-label">TOTAL SETS</div>
+      </div>
+    </div>
+
+    <div class="section-title">CALENDAR</div>
+    <div class="calendar" id="calendar"></div>
+
+    <div class="section-title">PROGRESS</div>
+    <div id="weight-progress"></div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav id="main-nav" style="display:none">
+  <button class="active" data-screen="home">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>HOME
+  </button>
+  <button data-screen="train">
+    <svg viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43 1.43 1.43 2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/></svg>TRAIN
+  </button>
+  <button data-screen="stats">
+    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>STATS
+  </button>
+</nav>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
